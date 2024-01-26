@@ -1,0 +1,18 @@
+---
+import { SP_ACC_URL } from '../constants';
+
+const params = new URLSearchParams(
+    {
+        client_id: import.meta.env.PT_ID,
+        response_type: "code",
+        redirect_uri: "http://localhost:4321/callback",
+        show_dialog: "true"
+        //scope: "playlist-read-private" CHRISTIAN: provide proper scopes and state
+    }
+);
+
+const url = SP_ACC_URL + "/authorize?" + params.toString();
+console.log(url);
+
+return Astro.redirect(url);
+---
