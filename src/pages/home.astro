@@ -1,4 +1,16 @@
 ---
+import { Debug } from "astro:components";
+import { SP_API_URL } from "../constants";
+
+const profileURL = SP_API_URL + "/me";
+const header =  `Bearer ${Astro.cookies.get("session")?.value}`;
+console.log(header);
+const profileRes = await fetch(profileURL, {
+    headers: {
+        Authorization: header
+    }
+});
+const resData = await profileRes.json();
 ---
 
 <html lang="en">
@@ -11,6 +23,7 @@
 	</head>
 	<body>
 		<h1>Hello World</h1>
+        <Debug {resData} />
 		<button >Connect to Spotify</button>
 	</body>
 </html>
