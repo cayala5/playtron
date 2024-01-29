@@ -1,8 +1,9 @@
 ---
 import { Debug } from "astro:components";
 import { SP_API_URL } from "../constants";
-import {Image} from 'astro:assets';
+import {Image, Picture} from 'astro:assets';
 import wordmark from '../images/wordmark.png';
+import avatar from '../images/avatar_example.png';
 
 const profileURL = SP_API_URL + "/me";
 const header =  `Bearer ${Astro.cookies.get("session")?.value}`;
@@ -12,9 +13,25 @@ const profileRes = await fetch(profileURL, {
         Authorization: header
     }
 });
-/*
-const resData = await profileRes.json();
-*/
+
+// CHRISTIAN START HERE: ask API for playlists and display them
+function makeCurrentUserRequest(token: string) {
+    const profileURL = SP_API_URL + "/me";
+    const header =  `Bearer ${token}`;
+    return fetch(profileURL, {
+        headers: {
+            Authorization: header
+        }
+    });
+}
+
+const resp = await makeCurrentUserRequest(Astro.cookies.get("session")?.value || "");
+if (resp.status !== 200) {
+    return Astro.redirect("/auth");
+}
+
+const data = await profileRes.json();
+const displayName = data.display_name;
 ---
 <style>
 :root{
@@ -25,18 +42,13 @@ const resData = await profileRes.json();
 }
 
 body {
-    margin: 0px;
+    margin: 0;
     color: hsl(var(--foreground));
+    background-color: hsl(var(--background));
 }
-.center-img {
-    display:block;
-    margin-left: auto;
-    margin-right: auto;
-}
-
 .wordmark {
     display:block;
-    padding: 20px;
+    padding: 1rem;
     margin: 0 auto;
 }
 
@@ -44,9 +56,36 @@ body {
     background-color: hsl(var(--card));
 }
 
-.bg {
-    background-color: hsl(var(--background));
+.rd-corner {
+    border-radius: 1rem;
+    overflow: hidden;
 }
+
+.h-flex {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.ft-big {
+    font-size: 2rem;
+}
+
+.pad {
+    padding: 1rem;
+}
+
+.circle {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.dim-card {
+    min-width: 400px;
+}
+
 </style>
 
 <html lang="en">
@@ -57,11 +96,29 @@ body {
 		<meta name="generator" content={Astro.generator} />
 		<title>Astro</title>
 	</head>
-	<body class="bg">
-        <div class="header bg-card">
+	<body>
+        <!--Header -->
+        <div class="bg-card">
+            <a href="/">
             <Image class="wordmark" src={wordmark} alt="Playtron"/>
+            </a>
+        </div>
+        <!-- Authenticate -->
+        <div>
+            <button >Connect to Spotify</button>
+        </div>
+        <!-- App area -->
+        <div class ="h-flex">
+            <div class="bg-card dim-card rd-corner h-flex pad">
+                <div class="circle">
+                    <Image src={avatar} alt="User avatar"/>
+                </div>
+                <div>
+                    <div class="ft-big">{displayName}</div>
+                    <div>11 playlists</div>
+                </div>
+            </div>
         </div>
 		<h1>Hello World</h1>
-		<button >Connect to Spotify</button>
 	</body>
 </html>
