@@ -1,6 +1,8 @@
 ---
 import { Debug } from "astro:components";
 import { SP_API_URL } from "../constants";
+import {Image} from 'astro:assets';
+import wordmark from '../images/wordmark.png';
 
 const profileURL = SP_API_URL + "/me";
 const header =  `Bearer ${Astro.cookies.get("session")?.value}`;
@@ -10,8 +12,42 @@ const profileRes = await fetch(profileURL, {
         Authorization: header
     }
 });
+/*
 const resData = await profileRes.json();
+*/
 ---
+<style>
+:root{
+    --primary: 142 71% 45%;
+    --background: 20 14% 4%;
+    --foreground: 0 0% 95%;
+    --card: 24 9% 10%
+}
+
+body {
+    margin: 0px;
+    color: hsl(var(--foreground));
+}
+.center-img {
+    display:block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.wordmark {
+    display:block;
+    padding: 20px;
+    margin: 0 auto;
+}
+
+.bg-card {
+    background-color: hsl(var(--card));
+}
+
+.bg {
+    background-color: hsl(var(--background));
+}
+</style>
 
 <html lang="en">
 	<head>
@@ -21,9 +57,11 @@ const resData = await profileRes.json();
 		<meta name="generator" content={Astro.generator} />
 		<title>Astro</title>
 	</head>
-	<body>
+	<body class="bg">
+        <div class="header bg-card">
+            <Image class="wordmark" src={wordmark} alt="Playtron"/>
+        </div>
 		<h1>Hello World</h1>
-        <Debug {resData} />
 		<button >Connect to Spotify</button>
 	</body>
 </html>
