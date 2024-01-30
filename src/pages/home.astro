@@ -1,37 +1,56 @@
 ---
 import { Debug } from "astro:components";
 import { SP_API_URL } from "../constants";
-import {Image, Picture} from 'astro:assets';
+import {Image} from 'astro:assets';
 import wordmark from '../images/wordmark.png';
 import avatar from '../images/avatar_example.png';
 
-const profileURL = SP_API_URL + "/me";
-const header =  `Bearer ${Astro.cookies.get("session")?.value}`;
-console.log(header);
-const profileRes = await fetch(profileURL, {
-    headers: {
-        Authorization: header
-    }
-});
-
-// CHRISTIAN START HERE: ask API for playlists and display them
 function makeCurrentUserRequest(token: string) {
     const profileURL = SP_API_URL + "/me";
-    const header =  `Bearer ${token}`;
     return fetch(profileURL, {
         headers: {
-            Authorization: header
+            Authorization: `Bearer ${token}`
         }
     });
 }
 
-const resp = await makeCurrentUserRequest(Astro.cookies.get("session")?.value || "");
-if (resp.status !== 200) {
+function makeCurrentUserPlaylistRequest(token: string) {
+    const playlistsURL = SP_API_URL + "/me/playlists";
+    return fetch(playlistsURL, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    });
+}
+
+function getJsonResponseData(response: Response) {
+    if (response.status !== 200) {
+        throw new Error(`Request failed with code ${response.status}`);
+    }
+
+    return response.json();
+}
+
+const token = Astro.cookies.get("session")?.value;
+if (token === undefined) {
     return Astro.redirect("/auth");
 }
 
-const data = await profileRes.json();
-const displayName = data.display_name;
+const resps = await Promise.all([
+    makeCurrentUserPlaylistRequest(token).then(getJsonResponseData),
+    makeCurrentUserRequest(token).then(getJsonResponseData)
+]).catch(err => {
+    console.log(err);
+    return;
+});
+
+if (!resps) {
+    return Astro.redirect("/error");
+}
+
+const [plData, uData] = resps;
+const displayName = uData.display_name;
+const numPlaylists = plData.total;
 ---
 <style>
 :root{
@@ -98,6 +117,7 @@ body {
 	</head>
 	<body>
         <!--Header -->
+        <!-- CHRISTIAN TODO: make this appear for all pages -->
         <div class="bg-card">
             <a href="/">
             <Image class="wordmark" src={wordmark} alt="Playtron"/>
@@ -115,7 +135,7 @@ body {
                 </div>
                 <div>
                     <div class="ft-big">{displayName}</div>
-                    <div>11 playlists</div>
+                    <div>{numPlaylists} playlists</div>
                 </div>
             </div>
         </div>
