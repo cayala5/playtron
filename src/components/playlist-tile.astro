@@ -1,0 +1,28 @@
+---
+import { Image } from 'astro:assets';
+interface Props {
+    name: string;
+    tracks: number;
+    imageSrc: string;
+}
+
+const { name, tracks, imageSrc } = Astro.props;
+---
+<style>
+    .root {
+        display: grid;
+        grid-template-columns: 1fr;
+        width: fit-content;
+        justify-items: center;
+    }
+</style>
+
+<div class="root card">
+    <Image
+        src={imageSrc}
+        alt=`Cover of playlist "${name}"`
+        height="64"
+        width="64"/>
+    <span>{name}</span>
+    <span>{`${tracks} tracks`}</span>
+</div>

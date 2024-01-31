@@ -4,7 +4,9 @@ import { SP_API_URL } from "../constants";
 import {Image} from 'astro:assets';
 import wordmark from '../images/wordmark.png';
 import avatar from '../images/avatar_example.png';
+import PlaylistTile from "../components/playlist-tile.astro";
 
+// CHRISTIAN TODO: spin off API requests to one file
 function makeCurrentUserRequest(token: string) {
     const profileURL = SP_API_URL + "/me";
     return fetch(profileURL, {
@@ -31,6 +33,7 @@ function getJsonResponseData(response: Response) {
     return response.json();
 }
 
+// CHRISTIAN TODO: implement a connect to spotify button on home
 const token = Astro.cookies.get("session")?.value;
 if (token === undefined) {
     return Astro.redirect("/auth");
@@ -50,25 +53,22 @@ if (!resps) {
 
 const [plData, uData] = resps;
 const displayName = uData.display_name;
+// CHRISTIAN TODO: user avatar pic
 const numPlaylists = plData.total;
+const playlist = plData.items[12];
 ---
-<style>
+<style is:global>
 :root{
     --primary: 142 71% 45%;
     --background: 20 14% 4%;
     --foreground: 0 0% 95%;
     --card: 24 9% 10%
 }
-
-body {
-    margin: 0;
-    color: hsl(var(--foreground));
-    background-color: hsl(var(--background));
-}
-.wordmark {
-    display:block;
+.card {
+    background-color: hsl(var(--card));
+    border-radius: 1rem;
+    overflow: hidden;
     padding: 1rem;
-    margin: 0 auto;
 }
 
 .bg-card {
@@ -107,6 +107,21 @@ body {
 
 </style>
 
+<style>
+
+body {
+    margin: 0;
+    color: hsl(var(--foreground));
+    background-color: hsl(var(--background));
+}
+.wordmark {
+    display:block;
+    padding: 1rem;
+    margin: 0 auto;
+}
+
+</style>
+
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
@@ -123,12 +138,8 @@ body {
             <Image class="wordmark" src={wordmark} alt="Playtron"/>
             </a>
         </div>
-        <!-- Authenticate -->
-        <div>
-            <button >Connect to Spotify</button>
-        </div>
         <!-- App area -->
-        <div class ="h-flex">
+        <div class ="pad h-flex">
             <div class="bg-card dim-card rd-corner h-flex pad">
                 <div class="circle">
                     <Image src={avatar} alt="User avatar"/>
@@ -139,6 +150,11 @@ body {
                 </div>
             </div>
         </div>
-		<h1>Hello World</h1>
+        <div class="pad">
+            <PlaylistTile
+                name={playlist.name}
+                tracks={playlist.tracks.total}
+                imageSrc={playlist.images[0].url}/>
+        </div>
 	</body>
 </html>
