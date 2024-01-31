@@ -1,0 +1,28 @@
+---
+/*
+- provide user playlists data to this component
+- validate it mildly, and if it doesn't work, just print error page
+- typecast the data
+- for each item, create a tile
+- insert all the tiles into a grid
+- grid should be at least two columns, and responsively scale up to 6
+ */
+import { Debug } from 'astro:components';
+import PlaylistTile from './playlist-tile.astro';
+
+interface Props {
+    data: any;
+}
+
+const {data} = Astro.props;
+---
+<div class="pad">
+    {
+        data.items.map(pl => (
+            <PlaylistTile
+                name= {pl.name}
+                tracks={pl.tracks.total}
+                imageSrc={pl.images[0].url} />
+        ))
+    }
+</div>

@@ -4,7 +4,7 @@ import { SP_API_URL } from "../constants";
 import {Image} from 'astro:assets';
 import wordmark from '../images/wordmark.png';
 import defaultAvatar from '../images/avatar_example.png';
-import PlaylistTile from "../components/playlist-tile.astro";
+import PlaylistArea from "../components/playlist-area.astro";
 
 // CHRISTIAN TODO: spin off API requests to one file
 function makeCurrentUserRequest(token: string) {
@@ -56,7 +56,6 @@ const displayName = uData.display_name;
 const avatarSrc = uData.images[0]?.url || defaultAvatar;
 // CHRISTIAN TODO: user avatar pic
 const numPlaylists = plData.total;
-const playlist = plData.items[12];
 ---
 <style is:global>
 :root{
@@ -155,11 +154,6 @@ body {
                 </div>
             </div>
         </div>
-        <div class="pad">
-            <PlaylistTile
-                name={playlist.name}
-                tracks={playlist.tracks.total}
-                imageSrc={playlist.images[0].url}/>
-        </div>
+        <PlaylistArea data={plData}/>
 	</body>
 </html>
