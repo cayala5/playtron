@@ -1,37 +1,10 @@
 ---
 import { Debug } from "astro:components";
-import { SP_API_URL } from "../constants";
 import {Image} from 'astro:assets';
 import wordmark from '../images/wordmark.png';
 import defaultAvatar from '../images/avatar_example.png';
 import PlaylistArea from "../components/playlist-area.astro";
-
-// CHRISTIAN TODO: spin off API requests to one file
-function makeCurrentUserRequest(token: string) {
-    const profileURL = SP_API_URL + "/me";
-    return fetch(profileURL, {
-        headers: {
-            Authorization: `Bearer ${token}`
-        }
-    });
-}
-
-function makeCurrentUserPlaylistRequest(token: string) {
-    const playlistsURL = SP_API_URL + "/me/playlists";
-    return fetch(playlistsURL, {
-        headers: {
-            Authorization: `Bearer ${token}`
-        }
-    });
-}
-
-function getJsonResponseData(response: Response) {
-    if (response.status !== 200) {
-        throw new Error(`Request failed with code ${response.status}`);
-    }
-
-    return response.json();
-}
+import {SpotifyAPIHelper} from "../script/spotify_api";
 
 // CHRISTIAN TODO: implement a connect to spotify button on home
 const token = Astro.cookies.get("session")?.value;
@@ -39,22 +12,27 @@ if (token === undefined) {
     return Astro.redirect("/auth");
 }
 
+const spotify = new SpotifyAPIHelper(token);
+
 const resps = await Promise.all([
-    makeCurrentUserPlaylistRequest(token).then(getJsonResponseData),
-    makeCurrentUserRequest(token).then(getJsonResponseData)
+    spotify.makeCurrentUserPlaylistRequest(),
+    spotify.makeCurrentUserRequest()
 ]).catch(err => {
     console.log(err);
     return;
 });
-
 if (!resps) {
     return Astro.redirect("/error");
 }
 
 const [plData, uData] = resps;
+if(!spotify.validateMePlaylistsResponse(plData)) {
+    console.log("Request to /me/playlists failed to return the right data");
+    return Astro.redirect("/error");
+}
+
 const displayName = uData.display_name;
 const avatarSrc = uData.images[0]?.url || defaultAvatar;
-// CHRISTIAN TODO: user avatar pic
 const numPlaylists = plData.total;
 ---
 <style is:global>

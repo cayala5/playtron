@@ -1,81 +1,24 @@
 ---
-/*
-X provide user playlists data to this component
-X validate it mildly, and if it doesn't work, just print error page
-X typecast the data
-X for each item, create a tile
-- insert all the tiles into a grid
-- grid should be at least two columns, and responsively scale up to 6
- */
 import { Debug } from 'astro:components';
 import PlaylistTile from './playlist-tile.astro';
+import type { MePlaylistsResponse } from '../script/spotify_api';
 
 interface Props {
-    data: any;
-}
-
-type PlaylistData = {
-    name: string,
-    tracks: {
-        href: string,
-        total: number
-    },
-    images: [
-        {
-            url: string
-        }
-    ]
-};
-
-type MePlaylistsResponse = {
-    total: number,
-    items: PlaylistData[]
-}
-
-function validatePlaylistData(obj: any): obj is PlaylistData {
-    const nameC = typeof obj.name === "string";
-    const tracksC = obj.tracks &&
-        typeof obj.tracks.href === "string" &&
-        typeof obj.tracks.total === "number";
-    const imagesC = Array.isArray(obj.images);
-
-    if (!(nameC && tracksC && imagesC)) {
-        console.log("Playlist data didn't validate");
-
-    }
-    return nameC && tracksC && imagesC;
-}
-
-function validateMePlaylistsResponse(data: any): data is MePlaylistsResponse {
-    if (!data.items) {
-        return false;
-    }
-
-    if (typeof data.tracks !== "number") {
-        return false;
-    }
-
-    if (!Array.isArray(data.items)) {
-        return false;
-    }
-
-    if (data.items.length > 0) {
-        const pl = data.items[0];
-        return validatePlaylistData(pl);
-    } else {
-        return true;
-    }
+    data: MePlaylistsResponse;
 }
 
 const {data} = Astro.props;
-if (!validateMePlaylistsResponse(data)) {
-    console.log("Data from /me/playlists is not right");
-    return Astro.redirect("/error");
-}
-
-
 ---
-<div class="pad">
+<style>
+    .root {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, 132px );
+        align-items: center;
+        justify-items: center;
+    }
+
+</style>
+<div class="pad root">
     {
         data.items.map(pl => (
             <PlaylistTile

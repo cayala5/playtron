@@ -12,8 +12,14 @@ const { name, tracks, imageSrc } = Astro.props;
     .root {
         display: grid;
         grid-template-columns: 1fr;
-        width: fit-content;
-        justify-items: center;
+        width: 100px;
+    }
+
+    .text-area {
+        text-align: left;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 </style>
 
@@ -21,8 +27,11 @@ const { name, tracks, imageSrc } = Astro.props;
     <Image
         src={imageSrc}
         alt=`Cover of playlist "${name}"`
-        height="64"
-        width="64"/>
-    <span>{name}</span>
-    <span>{`${tracks} tracks`}</span>
+        height={100}
+        width={100} />
+    <div class="text-area">
+        <span>{name}</span>
+        <br/>
+        <span>{`${tracks} tracks`}</span>
+    </div>
 </div>

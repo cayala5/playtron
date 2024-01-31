@@ -19,9 +19,15 @@ export type MePlaylistsResponse = {
     items: PlaylistData[]
 }
 
-export default {
+function getJsonResponseData(response: Response) {
+    if (response.status !== 200) {
+        throw new Error(`Request failed with code ${response.status}`);
+    }
 
-SpotifyAPIHelper: class {
+    return response.json();
+}
+
+export class SpotifyAPIHelper {
     private token: string;
 
     constructor(token: string) {
@@ -34,7 +40,7 @@ SpotifyAPIHelper: class {
             headers: {
                 Authorization: `Bearer ${this.token}`
             }
-        });
+        }).then(getJsonResponseData);
     }
 
     makeCurrentUserRequest() {
@@ -52,10 +58,6 @@ SpotifyAPIHelper: class {
             typeof obj.tracks.total === "number";
         const imagesC = Array.isArray(obj.images);
 
-        if (!(nameC && tracksC && imagesC)) {
-            console.log("Playlist data didn't validate");
-
-        }
         return nameC && tracksC && imagesC;
     }
 
@@ -64,7 +66,7 @@ SpotifyAPIHelper: class {
             return false;
         }
 
-        if (typeof data.tracks !== "number") {
+        if (typeof data.total !== "number") {
             return false;
         }
 
@@ -81,5 +83,3 @@ SpotifyAPIHelper: class {
     }
 
 }
-
-};
