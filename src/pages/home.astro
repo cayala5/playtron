@@ -3,7 +3,7 @@ import { Debug } from "astro:components";
 import { SP_API_URL } from "../constants";
 import {Image} from 'astro:assets';
 import wordmark from '../images/wordmark.png';
-import avatar from '../images/avatar_example.png';
+import defaultAvatar from '../images/avatar_example.png';
 import PlaylistTile from "../components/playlist-tile.astro";
 
 // CHRISTIAN TODO: spin off API requests to one file
@@ -53,6 +53,7 @@ if (!resps) {
 
 const [plData, uData] = resps;
 const displayName = uData.display_name;
+const avatarSrc = uData.images[0]?.url || defaultAvatar;
 // CHRISTIAN TODO: user avatar pic
 const numPlaylists = plData.total;
 const playlist = plData.items[12];
@@ -102,7 +103,8 @@ const playlist = plData.items[12];
 }
 
 .dim-card {
-    min-width: 400px;
+    min-width: 300px;
+    max-width: 400px;
 }
 
 </style>
@@ -142,7 +144,10 @@ body {
         <div class ="pad h-flex">
             <div class="bg-card dim-card rd-corner h-flex pad">
                 <div class="circle">
-                    <Image src={avatar} alt="User avatar"/>
+                    <Image src={avatarSrc}
+                        alt="User avatar"
+                        height={64}
+                        width={64}/>
                 </div>
                 <div>
                     <div class="ft-big">{displayName}</div>
