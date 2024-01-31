@@ -1,0 +1,32 @@
+---
+import { Debug } from 'astro:components';
+import PlaylistTile from './playlist-tile.astro';
+import type { MePlaylistsResponse } from '../script/spotify_api';
+
+interface Props {
+    data: MePlaylistsResponse;
+}
+
+const {data} = Astro.props;
+---
+<style>
+    .root {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, 100px );
+        gap: 43px;
+        align-items: center;
+        justify-items: center;
+        justify-content: center;
+    }
+
+</style>
+<div class="pad root">
+    {
+        data.items.map(pl => (
+            <PlaylistTile
+                name= {pl.name}
+                tracks={pl.tracks.total}
+                imageSrc={pl.images[0].url} />
+        ))
+    }
+</div>

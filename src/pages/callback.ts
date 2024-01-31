@@ -20,6 +20,7 @@ function makeTokenRequest(code: string): Promise<Response> {
     console.log(authOptions);
     console.log(url);
     return fetch(url, authOptions);
+    // CHRISTIAN TODO: implement refreshing token
 }
 
 export async function GET(context: APIContext) {
@@ -35,7 +36,10 @@ export async function GET(context: APIContext) {
         }
 
         const data = await response.json()
-        context.cookies.set("session", data.access_token);
+        context.cookies.set("session", data.access_token, {
+            httpOnly: true,
+            maxAge: 5*60
+        });
         return context.redirect("/");
     }
 }
