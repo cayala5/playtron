@@ -51,6 +51,12 @@ export class SpotifyAPIHelper {
         return this.makeGetRequest("/me/playlists");
     }
 
+    makeUpdatePlaylistItemsRequest() {
+        // CHRISTIAN: Implement
+        const plId = "CHRISTIAN";
+        const url = SP_API_URL + `/playlists/${plId}/tracks`;
+    }
+
     validatePlaylistData(obj: any): obj is PlaylistData {
         const nameC = typeof obj.name === "string";
         const tracksC = obj.tracks &&

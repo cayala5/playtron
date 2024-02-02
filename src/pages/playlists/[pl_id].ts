@@ -11,9 +11,37 @@ SCHEMA
         - For sort: {field: string}
 
 - if there's no snapshot, then just fail
-- get action
-- get
+- get action - for now if it's not "shuffle", just error
+
+REORDER ALGORITHM
+- let MAX_REQS be the max number of requests we want to make to reorder one playlist
+- let window be the bigger between 1 and the len(playlist) divided by MAX_REQS
+- let paste_location be 0
+- let snapshot_id be the snapshot we started with
+- while paste_location is more than a window away from the end of the playlist:
+   - select a random int in
+     [paste_location + 1, <the last location where you can grab a full window>]
+   - send request where range_start is that int, insert_before is paste_location,
+     range_length is window, snapshot_id is snapshot_id
+   - if the request failed, error out
+   - otherwise, update snapshot_id, advance paste_location by window
  */
+
+const MAX_REQS = 20;
+async function performHardShuffle(plId: string, plLeng: number, snapshot: string): Promise<any> {
+    if (plLeng < 2) {
+        return;
+    }
+
+    const window = Math.ceil(plLeng/MAX_REQS);
+    const paste = 0;
+    const currSnap = snapshot;
+    for (let i=0; i<MAX_REQS; ++i) {
+
+
+
+    }
+}
 
 export const PUT: APIRoute = ({params, request, url}) => {
     if (!url.searchParams.has("snapshot")) {
