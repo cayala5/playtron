@@ -34,12 +34,22 @@ async function performHardShuffle(plId: string, plLeng: number, snapshot: string
     }
 
     const window = Math.ceil(plLeng/MAX_REQS);
-    const paste = 0;
-    const currSnap = snapshot;
+    let paste = 0;
+    let currSnap = snapshot;
     for (let i=0; i<MAX_REQS; ++i) {
+        const lastPossibleStartIndex = plLeng - window;
+        if (lastPossibleStartIndex < paste) {
+            // there's fewer tracks left to shuffle than a full window
+            break;
+        }
 
+        // pick a random int uniformly from [paste, lastPossibleStartIndex]
+        const startIndex =
+            Math.floor(Math.random() * (lastPossibleStartIndex - paste + 1)) + paste
 
+        // make request
 
+        paste += window;
     }
 }
 
