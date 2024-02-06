@@ -3,7 +3,7 @@ import { SpotifyAPIHelper } from "../../script/spotify_api";
 
 /*
 SCHEMA
-- playtron/playlists/<id>?snapshot=<>
+- playtron/playlists/<id>
   - GET: 
   - PUT:
      - action: "shuffle"|"sort"
@@ -33,7 +33,7 @@ const MAX_REQS = 20;
 async function performHardShuffle(plId: string, token: string): Promise<any> {
     // CHRISTIAN TODO: call playlist request to determine length and get snapshot
     const plsLeng = MAX_REQS;
-    const snapshot = "CHRISTIAN";
+    const snapshot = "#####";
     if (plsLeng < 2) {
         return;
     }
@@ -81,17 +81,18 @@ export const PUT: APIRoute = async ({params, request, url, cookies, redirect}) =
         return redirect("/auth");
     }
 
-    if (!url.searchParams.has("snapshot")) {
-        return makeErrorResponse("Missing snapshot", 400);
-    }
-
-    const reqData = await request.json();
-    if (!reqData.action || reqData.action != "shuffle") {
-        return makeErrorResponse("Missing action", 400);
+    let reqData;
+    try {
+        reqData = await request.json();
+        if (!reqData.action || reqData.action != "shuffle") {
+            throw new Error();
+        }
+    } catch(error) {
+        return makeErrorResponse("Bad request body", 400);
     }
 
     try {
-        performHardShuffle(params.pl_id!, token);
+        await performHardShuffle(params.pl_id!, token);
     } catch (error) {
         console.log(error);
         return makeErrorResponse("Error shuffling playlist", 500);
