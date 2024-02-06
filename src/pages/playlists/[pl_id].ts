@@ -1,4 +1,5 @@
 import type { APIRoute } from "astro";
+import { SpotifyAPIHelper } from "../../script/spotify_api";
 
 /*
 SCHEMA
@@ -6,7 +7,7 @@ SCHEMA
   - GET: 
   - PUT:
      - action: "shuffle"|"sort"
-     - params: JSON
+     - params <optional>: 
         - For shuffle, nothing for now
         - For sort: {field: string}
 
@@ -27,40 +28,77 @@ REORDER ALGORITHM
    - otherwise, update snapshot_id, advance paste_location by window
  */
 
+// CHRISTIAN TODO: add eslint
 const MAX_REQS = 20;
-async function performHardShuffle(plId: string, plLeng: number, snapshot: string): Promise<any> {
-    if (plLeng < 2) {
+async function performHardShuffle(plId: string, token: string): Promise<any> {
+    // CHRISTIAN TODO: call playlist request to determine length and get snapshot
+    const plsLeng = MAX_REQS;
+    const snapshot = "CHRISTIAN";
+    if (plsLeng < 2) {
         return;
     }
 
-    const window = Math.ceil(plLeng/MAX_REQS);
+    const spotify = new SpotifyAPIHelper(token);
+    const window = Math.ceil(plsLeng/MAX_REQS);
     let paste = 0;
     let currSnap = snapshot;
     for (let i=0; i<MAX_REQS; ++i) {
-        const lastPossibleStartIndex = plLeng - window;
-        if (lastPossibleStartIndex < paste) {
+        const lastPossibleStartIndex = plsLeng - window;
+        if (paste > lastPossibleStartIndex) {
             // there's fewer tracks left to shuffle than a full window
             break;
         }
 
-        // pick a random int uniformly from [paste, lastPossibleStartIndex]
+        // pick an int randomly from [paste, lastPossibleStartIndex]
         const startIndex =
             Math.floor(Math.random() * (lastPossibleStartIndex - paste + 1)) + paste
 
-        // make request
+        const resp = await spotify.makeUpdatePlaylistItemsRequest(
+            plId, startIndex, paste, window, currSnap);
+        
+        if (!resp.snapshot_id || typeof resp.snapshot_id != "string") {
+            throw new Error("Unexpected response when updating playlist");
+        }
+
+        currSnap = resp.snapshot_id;
 
         paste += window;
     }
 }
 
-export const PUT: APIRoute = ({params, request, url}) => {
-    if (!url.searchParams.has("snapshot")) {
-        const bodyData = {
-            errorMessage: "Missing snapshot"
-        };
-        return new Response(JSON.stringify(bodyData), {
-            status: 400
-        });
+function makeErrorResponse(message: string, code: number) {
+    const bodyData = {
+        errorMessage: message
+    };
+    return new Response(JSON.stringify(bodyData), {
+        status: code
+    });
+}
+
+export const PUT: APIRoute = async ({params, request, url, cookies, redirect}) => {
+    const token = cookies.get("session")?.value;
+    if (token === undefined) {
+        return redirect("/auth");
     }
-    return new Response();
+
+    if (!url.searchParams.has("snapshot")) {
+        return makeErrorResponse("Missing snapshot", 400);
+    }
+
+    const reqData = await request.json();
+    if (!reqData.action || reqData.action != "shuffle") {
+        return makeErrorResponse("Missing action", 400);
+    }
+
+    try {
+        performHardShuffle(params.pl_id!, token);
+    } catch (error) {
+        console.log(error);
+        return makeErrorResponse("Error shuffling playlist", 500);
+    }
+
+    const success = new Response(null, {
+        status: 200
+    });
+    return success;
 };

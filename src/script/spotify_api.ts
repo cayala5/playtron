@@ -1,7 +1,7 @@
 
 import { SP_API_URL } from "../constants";
 
-export type PlaylistData = {
+export interface PlaylistData {
     name: string,
     tracks: {
         href: string,
@@ -12,11 +12,11 @@ export type PlaylistData = {
             url: string
         }
     ]
-};
+}
 
-export type MePlaylistsResponse = {
-    total: number,
-    items: PlaylistData[]
+export interface MePlaylistsResponse {
+    total: number;
+    items: PlaylistData[];
 }
 
 function getJsonResponseData(response: Response) {
@@ -42,6 +42,18 @@ export class SpotifyAPIHelper {
             }
         }).then(getJsonResponseData);
     }
+    
+    private makePostRequest(endpoint: string, body: string) {
+        const url = SP_API_URL + endpoint;
+        return fetch(url, {
+            headers: {
+                Authorization: `Bearer ${this.token}`,
+                "Content-Type": "application/json"
+            },
+            method: "POST",
+            body
+        }).then(getJsonResponseData);
+    }
 
     makeCurrentUserRequest() {
         return this.makeGetRequest("/me");
@@ -51,10 +63,14 @@ export class SpotifyAPIHelper {
         return this.makeGetRequest("/me/playlists");
     }
 
-    makeUpdatePlaylistItemsRequest() {
-        // CHRISTIAN: Implement
-        const plId = "CHRISTIAN";
-        const url = SP_API_URL + `/playlists/${plId}/tracks`;
+    makeUpdatePlaylistItemsRequest(playlistId: string, rangeStart: number, insertBefore: number, rangeLength: number, snapshotId: string) {
+        const body = JSON.stringify({
+            range_start: rangeStart,
+            insert_before: insertBefore,
+            range_length: rangeLength,
+            snapshot_id: snapshotId
+        });
+        return this.makePostRequest(`/playlists/${playlistId}/tracks`, body);
     }
 
     validatePlaylistData(obj: any): obj is PlaylistData {
