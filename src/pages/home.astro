@@ -37,7 +37,6 @@ if(!spotify.validateMePlaylistsResponse(plData)) {
 const displayName = uData.display_name;
 const avatarSrc = uData.images[0]?.url || defaultAvatar;
 const numPlaylists = plData.total;
-console.log(`CHRISTIAN: first aid id:${plData.items[0].id} snapshot:${plData.items[0].snapshot_id}`);
 ---
 <style is:global>
 :root{

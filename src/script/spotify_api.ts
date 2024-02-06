@@ -29,7 +29,6 @@ function getJsonResponseData(response: Response) {
 
     return response.json();
 }
-
 export class SpotifyAPIHelper {
     private token: string;
 
@@ -37,8 +36,10 @@ export class SpotifyAPIHelper {
         this.token = token;
     }
 
+    // CHRISTIAN TODO: deprecate this and make everyone use handleRequest
     private async makeGetRequest(endpoint: string) {
         const url = SP_API_URL + endpoint;
+        console.log("GET request to " + url);
         const resp = await fetch(url, {
             headers: {
                 Authorization: `Bearer ${this.token}`
@@ -46,11 +47,21 @@ export class SpotifyAPIHelper {
         });
         return getJsonResponseData(resp);
     }
+
+    private makeGetRequestRaw(endpoint: string) {
+        const url = SP_API_URL + endpoint;
+        console.log("GET request to " + url);
+        return fetch(url, {
+            headers: {
+                Authorization: `Bearer ${this.token}`
+            }
+        });
+    }
     
     private async makePutRequest(endpoint: string, body: string) {
         const url = SP_API_URL + endpoint;
-        console.error("CHRISTIAN: body is " + body);
-        const resp = await fetch(url, {
+        console.log(`PUT request to ${url} -- body: ${body}`);
+        return fetch(url, {
             headers: {
                 Authorization: `Bearer ${this.token}`,
                 "Content-Type": "application/json"
@@ -58,25 +69,49 @@ export class SpotifyAPIHelper {
             method: "PUT",
             body
         });
-        return getJsonResponseData(resp);
     }
 
-    makeCurrentUserRequest() {
+    private async handleRequest(req: Promise<Response>): Promise<any> {
+        try {
+            const resp = await req;
+            const data = await resp.json();
+            if (resp.status !== 200) {
+                const error = data.error;
+                throw new Error(`Request returned error code ${error.status}: "${error.message}"`);
+            }
+            console.log("RECEIVED data: " + JSON.stringify(data));
+            return data;
+        } catch(error) {
+            console.error("REQUEST FAILED");
+            console.error(error);
+        }
+    }
+
+    async makeCurrentUserRequest() {
         return this.makeGetRequest("/me");
     }
 
-    makeCurrentUserPlaylistRequest() {
+    async makeCurrentUserPlaylistRequest() {
         return this.makeGetRequest("/me/playlists");
     }
 
-    makeUpdatePlaylistItemsRequest(playlistId: string, rangeStart: number, insertBefore: number, rangeLength: number, snapshotId: string) {
+    async makeGetPlaylistRequest(playlistId: string, fields?: string[]) {
+        let endpoint = "/playlists/" + playlistId;
+        if (fields) {
+            endpoint += "?fields=" + fields.join(",");
+        }
+        const req = this.makeGetRequestRaw(endpoint);
+        return this.handleRequest(req);
+    }
+
+    async makeUpdatePlaylistItemsRequest(playlistId: string, rangeStart: number, insertBefore: number, rangeLength: number) {
         const body = JSON.stringify({
             range_start: rangeStart,
             insert_before: insertBefore,
-            range_length: rangeLength,
-            snapshot_id: snapshotId
+            range_length: rangeLength
         });
-        return this.makePutRequest(`/playlists/${playlistId}/tracks`, body);
+        const req = this.makePutRequest(`/playlists/${playlistId}/tracks`, body)
+        return this.handleRequest(req);
     }
 
     validatePlaylistData(obj: any): obj is PlaylistData {

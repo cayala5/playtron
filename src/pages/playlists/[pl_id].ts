@@ -10,38 +10,23 @@ SCHEMA
      - params <optional>: 
         - For shuffle, nothing for now
         - For sort: {field: string}
+*/
 
-- if there's no snapshot, then just fail
-- get action - for now if it's not "shuffle", just error
-
-REORDER ALGORITHM
-- let MAX_REQS be the max number of requests we want to make to reorder one playlist
-- let window be the bigger between 1 and the len(playlist) divided by MAX_REQS
-- let paste_location be 0
-- let snapshot_id be the snapshot we started with
-- while paste_location is more than a window away from the end of the playlist:
-   - select a random int in
-     [paste_location + 1, <the last location where you can grab a full window>]
-   - send request where range_start is that int, insert_before is paste_location,
-     range_length is window, snapshot_id is snapshot_id
-   - if the request failed, error out
-   - otherwise, update snapshot_id, advance paste_location by window
- */
-
-// CHRISTIAN TODO: add eslint
 const MAX_REQS = 20;
-async function performHardShuffle(plId: string, token: string): Promise<any> {
-    // CHRISTIAN TODO: call playlist request to determine length and get snapshot
-    const plsLeng = 5;
-    const snapshot = "#####";
-    if (plsLeng < 2) {
-        return;
+
+async function performHardShuffle(plId: string, token: string): Promise<boolean> {
+    const spotify = new SpotifyAPIHelper(token);
+    const data = await spotify.makeGetPlaylistRequest(plId, ["tracks.total"]);
+    if (!data) {
+        return false;
     }
 
-    const spotify = new SpotifyAPIHelper(token);
+    const plsLeng = data.tracks.total;
+    if (plsLeng < 2) {
+        return true;
+    }
     const window = Math.ceil(plsLeng/MAX_REQS);
     let paste = 0;
-    let currSnap = snapshot;
     for (let i=0; i<MAX_REQS; ++i) {
         const lastPossibleStartIndex = plsLeng - window;
         if (paste > lastPossibleStartIndex) {
@@ -54,16 +39,15 @@ async function performHardShuffle(plId: string, token: string): Promise<any> {
             Math.floor(Math.random() * (lastPossibleStartIndex - paste + 1)) + paste
 
         const resp = await spotify.makeUpdatePlaylistItemsRequest(
-            plId, startIndex, paste, window, currSnap);
-        
-        if (!resp.snapshot_id || typeof resp.snapshot_id != "string") {
-            throw new Error("Unexpected response when updating playlist");
+            plId, startIndex, paste, window);
+        if(!resp) {
+            return false;
         }
-
-        currSnap = resp.snapshot_id;
 
         paste += window;
     }
+
+    return true;
 }
 
 function makeErrorResponse(message: string, code: number) {
@@ -91,15 +75,11 @@ export const PUT: APIRoute = async ({params, request, url, cookies, redirect}) =
         return makeErrorResponse("Bad request body", 400);
     }
 
-    try {
-        await performHardShuffle(params.pl_id!, token);
-    } catch (error) {
-        console.log(error);
+    if(await performHardShuffle(params.pl_id!, token)) {
+        return new Response(null, {
+            status: 200
+        });
+    } else {
         return makeErrorResponse("Error shuffling playlist", 500);
     }
-
-    const success = new Response(null, {
-        status: 200
-    });
-    return success;
 };
