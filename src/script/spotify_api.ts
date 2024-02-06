@@ -1,6 +1,8 @@
 
 import { SP_API_URL } from "../constants";
 
+// CHRISTIAN TODO: refactor this module to handle validation and error responses and failures
+// and more consistently use async/await over promises
 export interface PlaylistData {
     name: string,
     tracks: {
@@ -34,25 +36,27 @@ export class SpotifyAPIHelper {
         this.token = token;
     }
 
-    private makeGetRequest(endpoint: string) {
+    private async makeGetRequest(endpoint: string) {
         const url = SP_API_URL + endpoint;
-        return fetch(url, {
+        const resp = await fetch(url, {
             headers: {
                 Authorization: `Bearer ${this.token}`
             }
-        }).then(getJsonResponseData);
+        });
+        return getJsonResponseData(resp);
     }
     
-    private makePostRequest(endpoint: string, body: string) {
+    private async makePostRequest(endpoint: string, body: string) {
         const url = SP_API_URL + endpoint;
-        return fetch(url, {
+        const resp = await fetch(url, {
             headers: {
                 Authorization: `Bearer ${this.token}`,
                 "Content-Type": "application/json"
             },
             method: "POST",
             body
-        }).then(getJsonResponseData);
+        });
+        return getJsonResponseData(resp);
     }
 
     makeCurrentUserRequest() {

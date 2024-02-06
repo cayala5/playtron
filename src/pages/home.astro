@@ -14,13 +14,16 @@ if (token === undefined) {
 
 const spotify = new SpotifyAPIHelper(token);
 
-const resps = await Promise.all([
-    spotify.makeCurrentUserPlaylistRequest(),
-    spotify.makeCurrentUserRequest()
-]).catch(err => {
-    console.log(err);
+let resps;
+try {
+    resps = await Promise.all([
+        spotify.makeCurrentUserPlaylistRequest(),
+        spotify.makeCurrentUserRequest()
+    ]);
+} catch(error) {
+    console.log(error);
     return;
-});
+}
 if (!resps) {
     return Astro.redirect("/error");
 }

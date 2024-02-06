@@ -1,4 +1,4 @@
-import type { APIContext } from 'astro';
+import type { APIRoute } from 'astro';
 import { SP_ACC_URL } from '../constants';
 
 function makeTokenRequest(code: string): Promise<Response> {
@@ -23,23 +23,25 @@ function makeTokenRequest(code: string): Promise<Response> {
     // CHRISTIAN TODO: implement refreshing token
 }
 
-export async function GET(context: APIContext) {
-    const qparams = context.url.searchParams;
+export const GET: APIRoute = async ({redirect, cookies, url}) => {
+    const qparams = url.searchParams;
     if (qparams.has("error")) {
-        return context.redirect("/error");
-    } else if (qparams.has("code")) {
+        return redirect("/error");
+    } else if (!qparams.has("code")) {
+        return redirect("/error");
+    } else {
         const response = await makeTokenRequest(qparams.get("code")!)
 
         if (response.status !== 200) {
             console.log(await response.text());
-            return context.redirect("/error");
+            return redirect("/error");
         }
 
         const data = await response.json()
-        context.cookies.set("session", data.access_token, {
+        cookies.set("session", data.access_token, {
             httpOnly: true,
             maxAge: 5*60
         });
-        return context.redirect("/");
+        return redirect("/");
     }
 }
