@@ -32,7 +32,7 @@ REORDER ALGORITHM
 const MAX_REQS = 20;
 async function performHardShuffle(plId: string, token: string): Promise<any> {
     // CHRISTIAN TODO: call playlist request to determine length and get snapshot
-    const plsLeng = MAX_REQS;
+    const plsLeng = 5;
     const snapshot = "#####";
     if (plsLeng < 2) {
         return;

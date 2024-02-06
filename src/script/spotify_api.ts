@@ -2,7 +2,8 @@
 import { SP_API_URL } from "../constants";
 
 // CHRISTIAN TODO: refactor this module to handle validation and error responses and failures
-// and more consistently use async/await over promises
+// and more consistently use async/await over promises. Also print helpful stuff in console log
+// from what we get back from the API and from what we know in the code
 export interface PlaylistData {
     name: string,
     tracks: {
@@ -46,14 +47,15 @@ export class SpotifyAPIHelper {
         return getJsonResponseData(resp);
     }
     
-    private async makePostRequest(endpoint: string, body: string) {
+    private async makePutRequest(endpoint: string, body: string) {
         const url = SP_API_URL + endpoint;
+        console.error("CHRISTIAN: body is " + body);
         const resp = await fetch(url, {
             headers: {
                 Authorization: `Bearer ${this.token}`,
                 "Content-Type": "application/json"
             },
-            method: "POST",
+            method: "PUT",
             body
         });
         return getJsonResponseData(resp);
@@ -74,7 +76,7 @@ export class SpotifyAPIHelper {
             range_length: rangeLength,
             snapshot_id: snapshotId
         });
-        return this.makePostRequest(`/playlists/${playlistId}/tracks`, body);
+        return this.makePutRequest(`/playlists/${playlistId}/tracks`, body);
     }
 
     validatePlaylistData(obj: any): obj is PlaylistData {

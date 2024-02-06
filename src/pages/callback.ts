@@ -40,7 +40,7 @@ export const GET: APIRoute = async ({redirect, cookies, url}) => {
         const data = await response.json()
         cookies.set("session", data.access_token, {
             httpOnly: true,
-            maxAge: 5*60
+            maxAge: 60*60
         });
         return redirect("/");
     }
