@@ -28,13 +28,22 @@ const { name, tracks, imageSrc, plId } = Astro.props;
 <script>
     const tiles = document.querySelectorAll("div.playlist-tile");
 
+    async function makePutRequest(plId: any) {
+        const resp = await fetch("/playlists/" + plId, {
+            method: "PUT",
+            body: JSON.stringify({action: "shuffle"})
+        });
+        console.log(resp.status);
+    }
+
     tiles.forEach((elem) => {
         const tile = elem as HTMLDivElement;
         const plId = tile.dataset.plId
-        tile.addEventListener('click', () => {
-            alert(`Clicked on playlist with id ${plId}`);
+        tile.addEventListener('click', async () => {
+            await makePutRequest(plId);
         });
     });
+
 </script>
 
 <div class="root card playlist-tile" data-pl-id={plId}>
