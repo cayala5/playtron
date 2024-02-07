@@ -12,7 +12,7 @@ const {data} = Astro.props;
 <style>
     .root {
         display: grid;
-        grid-template-columns: repeat(auto-fit, 100px );
+        grid-template-columns: repeat(auto-fit, 100px);
         gap: 43px;
         align-items: center;
         justify-items: center;
@@ -26,7 +26,8 @@ const {data} = Astro.props;
             <PlaylistTile
                 name= {pl.name}
                 tracks={pl.tracks.total}
-                imageSrc={pl.images[0].url} />
+                imageSrc={pl.images[0].url}
+                plId={pl.id} />
         ))
     }
 </div>

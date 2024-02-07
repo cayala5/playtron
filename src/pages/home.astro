@@ -6,7 +6,6 @@ import defaultAvatar from '../images/avatar_example.png';
 import PlaylistArea from "../components/playlist-area.astro";
 import {SpotifyAPIHelper} from "../script/spotify_api";
 
-// CHRISTIAN TODO: implement a connect to spotify button on home
 const token = Astro.cookies.get("session")?.value;
 if (token === undefined) {
     return Astro.redirect("/auth");
@@ -14,13 +13,16 @@ if (token === undefined) {
 
 const spotify = new SpotifyAPIHelper(token);
 
-const resps = await Promise.all([
-    spotify.makeCurrentUserPlaylistRequest(),
-    spotify.makeCurrentUserRequest()
-]).catch(err => {
-    console.log(err);
+let resps;
+try {
+    resps = await Promise.all([
+        spotify.makeCurrentUserPlaylistRequest(),
+        spotify.makeCurrentUserRequest()
+    ]);
+} catch(error) {
+    console.log(error);
     return;
-});
+}
 if (!resps) {
     return Astro.redirect("/error");
 }
@@ -40,7 +42,8 @@ const numPlaylists = plData.total;
     --primary: 142 71% 45%;
     --background: 20 14% 4%;
     --foreground: 0 0% 95%;
-    --card: 24 9% 10%
+    --card: 24 9% 10%;
+    font-family: sans-serif;
 }
 .card {
     background-color: hsl(var(--card));
@@ -111,7 +114,6 @@ body {
 	</head>
 	<body>
         <!--Header -->
-        <!-- CHRISTIAN TODO: make this appear for all pages -->
         <div class="bg-card">
             <a href="/">
             <Image class="wordmark" src={wordmark} alt="Playtron"/>

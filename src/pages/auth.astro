@@ -6,8 +6,9 @@ const params = new URLSearchParams(
         client_id: import.meta.env.PT_ID,
         response_type: "code",
         redirect_uri: "http://localhost:4321/callback",
-        show_dialog: "true"
-        //scope: "playlist-read-private" CHRISTIAN TODO: provide proper scopes and state
+        show_dialog: "true",
+        scope: "playlist-modify-public playlist-modify-private"
+        // TODO: provide state arg
     }
 );
 

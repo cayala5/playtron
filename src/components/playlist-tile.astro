@@ -4,9 +4,10 @@ interface Props {
     name: string;
     tracks: number;
     imageSrc: string;
+    plId: string;
 }
 
-const { name, tracks, imageSrc } = Astro.props;
+const { name, tracks, imageSrc, plId } = Astro.props;
 ---
 <style>
     .root {
@@ -23,7 +24,33 @@ const { name, tracks, imageSrc } = Astro.props;
     }
 </style>
 
-<div class="root card">
+<script>
+    const tiles = document.querySelectorAll("div.playlist-tile");
+
+    async function makePutRequest(plId: any) {
+        const resp = await fetch("/playlists/" + plId, {
+            method: "PUT",
+            body: JSON.stringify({action: "shuffle"})
+        });
+        return resp.ok;
+    }
+
+    tiles.forEach((elem) => {
+        const tile = elem as HTMLDivElement;
+        const plId = tile.dataset.plId;
+        const name = tile.dataset.name;
+        tile.addEventListener('click', async () => {
+            const success = await makePutRequest(plId);
+            const alertMsg = success ?
+                `Playlist ${name} shuffled successfully` :
+                `Error while shuffling playlist ${name}`;
+            alert(alertMsg);
+        });
+    });
+
+</script>
+
+<div class="root card playlist-tile" data-pl-id={plId} data-name={name}>
     <Image
         src={imageSrc}
         alt=`Cover of playlist "${name}"`
