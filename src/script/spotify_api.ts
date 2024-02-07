@@ -6,6 +6,7 @@ import { SP_API_URL } from "../constants";
 // from what we get back from the API and from what we know in the code
 export interface PlaylistData {
     name: string,
+    id: string,
     tracks: {
         href: string,
         total: number

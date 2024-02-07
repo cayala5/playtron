@@ -4,9 +4,10 @@ interface Props {
     name: string;
     tracks: number;
     imageSrc: string;
+    plId: string;
 }
 
-const { name, tracks, imageSrc } = Astro.props;
+const { name, tracks, imageSrc, plId } = Astro.props;
 // CHRISTIAN START HERE: clicking a tile should send a put to /playlists/<id>
 ---
 <style>
@@ -27,14 +28,16 @@ const { name, tracks, imageSrc } = Astro.props;
 <script>
     const tiles = document.querySelectorAll("div.playlist-tile");
 
-    tiles.forEach((tile) => {
+    tiles.forEach((elem) => {
+        const tile = elem as HTMLDivElement;
+        const plId = tile.dataset.plId
         tile.addEventListener('click', () => {
-            alert("tile was clicked");
+            alert(`Clicked on playlist with id ${plId}`);
         });
     });
 </script>
 
-<div class="root card playlist-tile">
+<div class="root card playlist-tile" data-pl-id={plId}>
     <Image
         src={imageSrc}
         alt=`Cover of playlist "${name}"`
