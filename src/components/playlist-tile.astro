@@ -7,7 +7,7 @@ interface Props {
 }
 
 const { name, tracks, imageSrc } = Astro.props;
-// CHRISTIAN START HERE: clicking a tile should go to a new endpoint that implements the hard shuffle
+// CHRISTIAN START HERE: clicking a tile should send a put to /playlists/<id>
 ---
 <style>
     .root {
@@ -24,7 +24,17 @@ const { name, tracks, imageSrc } = Astro.props;
     }
 </style>
 
-<div class="root card">
+<script>
+    const tiles = document.querySelectorAll("div.playlist-tile");
+
+    tiles.forEach((tile) => {
+        tile.addEventListener('click', () => {
+            alert("tile was clicked");
+        });
+    });
+</script>
+
+<div class="root card playlist-tile">
     <Image
         src={imageSrc}
         alt=`Cover of playlist "${name}"`
