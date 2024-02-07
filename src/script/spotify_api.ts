@@ -1,7 +1,7 @@
 
 import { SP_API_URL } from "../constants";
 
-// CHRISTIAN TODO: refactor this module to handle validation and error responses and failures
+// TODO: refactor this module to handle validation and error responses and failures
 // and more consistently use async/await over promises. Also print helpful stuff in console log
 // from what we get back from the API and from what we know in the code
 export interface PlaylistData {
@@ -37,7 +37,7 @@ export class SpotifyAPIHelper {
         this.token = token;
     }
 
-    // CHRISTIAN TODO: deprecate this and make everyone use handleRequest
+    // TODO: deprecate this and make everyone use handleRequest
     private async makeGetRequest(endpoint: string) {
         const url = SP_API_URL + endpoint;
         console.log("GET request to " + url);

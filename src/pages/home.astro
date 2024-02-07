@@ -6,7 +6,6 @@ import defaultAvatar from '../images/avatar_example.png';
 import PlaylistArea from "../components/playlist-area.astro";
 import {SpotifyAPIHelper} from "../script/spotify_api";
 
-// CHRISTIAN TODO: implement a connect to spotify button on home
 const token = Astro.cookies.get("session")?.value;
 if (token === undefined) {
     return Astro.redirect("/auth");
@@ -115,7 +114,6 @@ body {
 	</head>
 	<body>
         <!--Header -->
-        <!-- CHRISTIAN TODO: make this appear for all pages -->
         <div class="bg-card">
             <a href="/">
             <Image class="wordmark" src={wordmark} alt="Playtron"/>

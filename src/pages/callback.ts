@@ -20,7 +20,6 @@ function makeTokenRequest(code: string): Promise<Response> {
     console.log(authOptions);
     console.log(url);
     return fetch(url, authOptions);
-    // CHRISTIAN TODO: implement refreshing token
 }
 
 export const GET: APIRoute = async ({redirect, cookies, url}) => {

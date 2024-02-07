@@ -32,7 +32,7 @@ const { name, tracks, imageSrc, plId } = Astro.props;
             method: "PUT",
             body: JSON.stringify({action: "shuffle"})
         });
-        return resp.ok
+        return resp.ok;
     }
 
     tiles.forEach((elem) => {
