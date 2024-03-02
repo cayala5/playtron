@@ -14,5 +14,12 @@
     "@astrojs/node": "^8.0.0",
     "astro": "^4.2.4",
     "typescript": "^5.3.3"
+  },
+  "devDependencies": {
+    "@typescript-eslint/parser": "^7.1.0",
+    "eslint": "^8.57.0",
+    "eslint-plugin-astro": "^0.31.4",
+    "eslint-plugin-import": "^2.29.1",
+    "typescript-eslint": "^7.1.0"
   }
 }
