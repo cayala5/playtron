@@ -1,5 +1,5 @@
 ---
-import { Image } from 'astro:assets';
+import { Image } from "astro:assets";
 interface Props {
     name: string;
     tracks: number;
@@ -9,6 +9,7 @@ interface Props {
 
 const { name, tracks, imageSrc, plId } = Astro.props;
 ---
+
 <style>
     .root {
         display: grid;
@@ -30,7 +31,7 @@ const { name, tracks, imageSrc, plId } = Astro.props;
     async function makePutRequest(plId: any) {
         const resp = await fetch("/playlists/" + plId, {
             method: "PUT",
-            body: JSON.stringify({action: "shuffle"})
+            body: JSON.stringify({ action: "shuffle" }),
         });
         return resp.ok;
     }
@@ -39,15 +40,14 @@ const { name, tracks, imageSrc, plId } = Astro.props;
         const tile = elem as HTMLDivElement;
         const plId = tile.dataset.plId;
         const name = tile.dataset.name;
-        tile.addEventListener('click', async () => {
+        tile.addEventListener("click", async () => {
             const success = await makePutRequest(plId);
-            const alertMsg = success ?
-                `Playlist ${name} shuffled successfully` :
-                `Error while shuffling playlist ${name}`;
+            const alertMsg = success
+                ? `Playlist ${name} shuffled successfully`
+                : `Error while shuffling playlist ${name}`;
             alert(alertMsg);
         });
     });
-
 </script>
 
 <div class="root card playlist-tile" data-pl-id={plId} data-name={name}>
@@ -55,10 +55,11 @@ const { name, tracks, imageSrc, plId } = Astro.props;
         src={imageSrc}
         alt=`Cover of playlist "${name}"`
         height={100}
-        width={100} />
+        width={100}
+    />
     <div class="text-area">
         <span>{name}</span>
-        <br/>
+        <br />
         <span>{`${tracks} tracks`}</span>
     </div>
 </div>

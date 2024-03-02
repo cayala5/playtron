@@ -1,10 +1,10 @@
 ---
 import { Debug } from "astro:components";
-import {Image} from 'astro:assets';
-import wordmark from '../images/wordmark.png';
-import defaultAvatar from '../images/avatar_example.png';
+import { Image } from "astro:assets";
+import wordmark from "../images/wordmark.png";
+import defaultAvatar from "../images/avatar_example.png";
 import PlaylistArea from "../components/playlist-area.astro";
-import {SpotifyAPIHelper} from "../script/spotify_api";
+import { SpotifyAPIHelper } from "../script/spotify_api";
 
 const token = Astro.cookies.get("session")?.value;
 if (token === undefined) {
@@ -17,9 +17,9 @@ let resps;
 try {
     resps = await Promise.all([
         spotify.makeCurrentUserPlaylistRequest(),
-        spotify.makeCurrentUserRequest()
+        spotify.makeCurrentUserRequest(),
     ]);
-} catch(error) {
+} catch (error) {
     console.log(error);
     return;
 }
@@ -28,7 +28,7 @@ if (!resps) {
 }
 
 const [plData, uData] = resps;
-if(!spotify.validateMePlaylistsResponse(plData)) {
+if (!spotify.validateMePlaylistsResponse(plData)) {
     console.log("Request to /me/playlists failed to return the right data");
     return Astro.redirect("/error");
 }
@@ -37,96 +37,96 @@ const displayName = uData.display_name;
 const avatarSrc = uData.images[0]?.url || defaultAvatar;
 const numPlaylists = plData.total;
 ---
+
 <style is:global>
-:root{
-    --primary: 142 71% 45%;
-    --background: 20 14% 4%;
-    --foreground: 0 0% 95%;
-    --card: 24 9% 10%;
-    font-family: sans-serif;
-}
-.card {
-    background-color: hsl(var(--card));
-    border-radius: 1rem;
-    overflow: hidden;
-    padding: 1rem;
-}
+    :root {
+        --primary: 142 71% 45%;
+        --background: 20 14% 4%;
+        --foreground: 0 0% 95%;
+        --card: 24 9% 10%;
+        font-family: sans-serif;
+    }
+    .card {
+        background-color: hsl(var(--card));
+        border-radius: 1rem;
+        overflow: hidden;
+        padding: 1rem;
+    }
 
-.bg-card {
-    background-color: hsl(var(--card));
-}
+    .bg-card {
+        background-color: hsl(var(--card));
+    }
 
-.rd-corner {
-    border-radius: 1rem;
-    overflow: hidden;
-}
+    .rd-corner {
+        border-radius: 1rem;
+        overflow: hidden;
+    }
 
-.h-flex {
-    display: flex;
-    justify-content: space-evenly;
-    align-items: center;
-}
+    .h-flex {
+        display: flex;
+        justify-content: space-evenly;
+        align-items: center;
+    }
 
-.ft-big {
-    font-size: 2rem;
-}
+    .ft-big {
+        font-size: 2rem;
+    }
 
-.pad {
-    padding: 1rem;
-}
+    .pad {
+        padding: 1rem;
+    }
 
-.circle {
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
-    overflow: hidden;
-}
+    .circle {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        overflow: hidden;
+    }
 
-.dim-card {
-    min-width: 300px;
-    max-width: 400px;
-}
-
+    .dim-card {
+        min-width: 300px;
+        max-width: 400px;
+    }
 </style>
 
 <style>
-
-body {
-    margin: 0;
-    color: hsl(var(--foreground));
-    background-color: hsl(var(--background));
-}
-.wordmark {
-    display:block;
-    padding: 1rem;
-    margin: 0 auto;
-}
-
+    body {
+        margin: 0;
+        color: hsl(var(--foreground));
+        background-color: hsl(var(--background));
+    }
+    .wordmark {
+        display: block;
+        padding: 1rem;
+        margin: 0 auto;
+    }
 </style>
 
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
+    <head>
+        <meta charset="utf-8" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <meta name="viewport" content="width=device-width" />
+        <meta name="generator" content={Astro.generator} />
+        <title>Astro</title>
+    </head>
+    <body>
         <!--Header -->
         <div class="bg-card">
             <a href="/">
-            <Image class="wordmark" src={wordmark} alt="Playtron"/>
+                <Image class="wordmark" src={wordmark} alt="Playtron" />
             </a>
         </div>
         <!-- App area -->
-        <div class ="pad h-flex">
+        <div class="pad h-flex">
             <div class="bg-card dim-card rd-corner h-flex pad">
                 <div class="circle">
-                    <Image src={avatarSrc}
+                    <Image
+                        src={avatarSrc}
                         alt="User avatar"
                         height={64}
-                        width={64}/>
+                        width={64}
+                    />
                 </div>
                 <div>
                     <div class="ft-big">{displayName}</div>
@@ -134,6 +134,6 @@ body {
                 </div>
             </div>
         </div>
-        <PlaylistArea data={plData}/>
-	</body>
+        <PlaylistArea data={plData} />
+    </body>
 </html>
