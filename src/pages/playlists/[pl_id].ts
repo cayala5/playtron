@@ -71,7 +71,6 @@ function makeErrorResponse(message: string, code: number) {
 export const PUT: APIRoute = async ({
     params,
     request,
-    url,
     cookies,
     redirect,
 }) => {

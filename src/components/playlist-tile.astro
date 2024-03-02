@@ -28,7 +28,7 @@ const { name, tracks, imageSrc, plId } = Astro.props;
 <script>
     const tiles = document.querySelectorAll("div.playlist-tile");
 
-    async function makePutRequest(plId: any) {
+    async function makePutRequest(plId: string) {
         const resp = await fetch("/playlists/" + plId, {
             method: "PUT",
             body: JSON.stringify({ action: "shuffle" }),
@@ -40,6 +40,10 @@ const { name, tracks, imageSrc, plId } = Astro.props;
         const tile = elem as HTMLDivElement;
         const plId = tile.dataset.plId;
         const name = tile.dataset.name;
+        if (!plId || !name) {
+            return;
+        }
+
         tile.addEventListener("click", async () => {
             const success = await makePutRequest(plId);
             const alertMsg = success

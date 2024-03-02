@@ -71,7 +71,7 @@ export class SpotifyAPIHelper {
         });
     }
 
-    private async handleRequest(req: Promise<Response>): Promise<any> {
+    private async handleRequest(req: Promise<Response>): Promise<unknown> {
         try {
             const resp = await req;
             const data = await resp.json();
@@ -124,7 +124,8 @@ export class SpotifyAPIHelper {
         return this.handleRequest(req);
     }
 
-    validatePlaylistData(obj: any): obj is PlaylistData {
+    // CHRISTIAN START HERE: make this work with unknown and keep correcting lint errors
+    validatePlaylistData(obj: unknown): obj is PlaylistData {
         const nameC = typeof obj.name === "string";
         const tracksC =
             obj.tracks &&
@@ -135,12 +136,15 @@ export class SpotifyAPIHelper {
         return nameC && tracksC && imagesC;
     }
 
-    validateMePlaylistsResponse(data: any): data is MePlaylistsResponse {
-        if (!data.items) {
+    validateMePlaylistsResponse(data: unknown): data is MePlaylistsResponse {
+        if (typeof data !== "object" || data == null){
+            return false;
+        }
+        if (!("items" in data)) {
             return false;
         }
 
-        if (typeof data.total !== "number") {
+        if (!("total" in data) || typeof data.total !== "number") {
             return false;
         }
 
