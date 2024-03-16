@@ -124,13 +124,22 @@ export class SpotifyAPIHelper {
         return this.handleRequest(req);
     }
 
-    // CHRISTIAN TODO: consider a proper validation library for further changes to these functions
+    // TODO: consider a proper validation library for further changes to these functions
     validatePlaylistData(obj: unknown): obj is PlaylistData {
-        if (typeof obj !== "object" || obj == null){
+        if (typeof obj !== "object" || obj == null) {
             return false;
         }
 
-        if (!("name" in obj) || typeof obj.name !== "string" || !("tracks" in obj) || typeof obj.tracks !== "object"  || obj.tracks == null || !("images" in obj) || typeof obj.images !== "object" || obj.images == null) {
+        if (
+            !("name" in obj) ||
+            typeof obj.name !== "string" ||
+            !("tracks" in obj) ||
+            typeof obj.tracks !== "object" ||
+            obj.tracks == null ||
+            !("images" in obj) ||
+            typeof obj.images !== "object" ||
+            obj.images == null
+        ) {
             return false;
         }
 
@@ -148,7 +157,7 @@ export class SpotifyAPIHelper {
     }
 
     validateMePlaylistsResponse(data: unknown): data is MePlaylistsResponse {
-        if (typeof data !== "object" || data == null){
+        if (typeof data !== "object" || data == null) {
             return false;
         }
         if (!("items" in data)) {

@@ -14,13 +14,20 @@ SCHEMA
 
 const MAX_REQS = 20;
 
-// CHRISTIAN TODO: prettier everything, run eslint, add commands to npm, and test commands
+interface PlaylistTracksResponse {
+    tracks: {
+        total: number;
+    };
+}
+
 async function performHardShuffle(
     plId: string,
     token: string,
 ): Promise<boolean> {
     const spotify = new SpotifyAPIHelper(token);
-    const data = await spotify.makeGetPlaylistRequest(plId, ["tracks.total"]);
+    const data = (await spotify.makeGetPlaylistRequest(plId, [
+        "tracks.total",
+    ])) as PlaylistTracksResponse;
     if (!data) {
         return false;
     }
@@ -68,12 +75,7 @@ function makeErrorResponse(message: string, code: number) {
     });
 }
 
-export const PUT: APIRoute = async ({
-    params,
-    request,
-    cookies,
-    redirect,
-}) => {
+export const PUT: APIRoute = async ({ params, request, cookies, redirect }) => {
     const token = cookies.get("session")?.value;
     if (token === undefined) {
         return redirect("/auth");
