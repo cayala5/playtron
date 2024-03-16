@@ -1,0 +1,14 @@
+---
+/* CHRISTIAN START HERE: make request with spotify.makeCurrentUserPlaylistRequest()
+ * with the offset and limit we read from the request, and return the proper html partial
+ */
+//import PlaylistTile from "../../components/playlist-tile.astro";
+
+export const partial = true;
+
+console.log("CHRISTIAN");
+console.log(Astro.url);
+const token = Astro.cookies.get("session")?.value;
+console.log(token);
+---
+<div class="hi"/>

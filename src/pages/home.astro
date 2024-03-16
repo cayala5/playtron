@@ -5,6 +5,37 @@ import defaultAvatar from "../images/avatar_example.png";
 import PlaylistArea from "../components/playlist-area.astro";
 import { SpotifyAPIHelper } from "../script/spotify_api";
 
+/* CHRISTIAN PLAN
+Tasks
+-- Create a playlists endpoint that takes offset and limit and make sure it returns the html we expect
+-- Set up htmx
+-- Home page asks for playlists and displays them
+-- Modify endpoint to take an arg that embeds an htmx request on reveal, load, or none, and make sure infinite scroll works
+-- Show spinners
+-- Set up alpine
+-- Implement filtering search bar
+-- Make request on first search for playlists with load embed
+
+Features
+-- infinite scroll UI of all playlists
+   -- populate home page with htmx that requests the first batch, and htmx that will ask for the next batch on scroll
+   -- scroll requests next batch, and then populates UI via htmx which has its own UI to ask for the next batch
+   -- alpine will need to handle interactions, and styles need to come from higher up
+   -- request needs a param that says how the returned playlists should embed the request for more lists
+   -- if someone adds a playlist with their window open, all of this will get thrown off -- either detect that it happened and tell user to reload, or try and stay correct
+-- search bar 
+   -- on first character, filter using what we have so far, and request the next batch of playlists, and embed should be on load instead of on reveal
+-- click icon replaces header
+   -- * maybe do this in another PR
+   -- new UI element for a playlist, and new request endpoint that returns htmx of it
+   -- have some UI on hover for each item
+   -- get htmx set up 
+   -- have a button there that does the shuffle
+   -- click anywhere else and get the original thing back
+-- home page
+   -- * maybe do this in another PR
+ */
+
 const token = Astro.cookies.get("session")?.value;
 if (token === undefined) {
     return Astro.redirect("/auth");
