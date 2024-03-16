@@ -1,14 +1,14 @@
 ---
-import { Debug } from 'astro:components';
-import PlaylistTile from './playlist-tile.astro';
-import type { MePlaylistsResponse } from '../script/spotify_api';
+import PlaylistTile from "./playlist-tile.astro";
+import type { MePlaylistsResponse } from "../script/spotify_api";
 
 interface Props {
     data: MePlaylistsResponse;
 }
 
-const {data} = Astro.props;
+const { data } = Astro.props;
 ---
+
 <style>
     .root {
         display: grid;
@@ -18,16 +18,16 @@ const {data} = Astro.props;
         justify-items: center;
         justify-content: center;
     }
-
 </style>
 <div class="pad root">
     {
-        data.items.map(pl => (
+        data.items.map((pl) => (
             <PlaylistTile
-                name= {pl.name}
+                name={pl.name}
                 tracks={pl.tracks.total}
                 imageSrc={pl.images[0].url}
-                plId={pl.id} />
+                plId={pl.id}
+            />
         ))
     }
 </div>

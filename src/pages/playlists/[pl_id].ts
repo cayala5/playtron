@@ -14,9 +14,20 @@ SCHEMA
 
 const MAX_REQS = 20;
 
-async function performHardShuffle(plId: string, token: string): Promise<boolean> {
+interface PlaylistTracksResponse {
+    tracks: {
+        total: number;
+    };
+}
+
+async function performHardShuffle(
+    plId: string,
+    token: string,
+): Promise<boolean> {
     const spotify = new SpotifyAPIHelper(token);
-    const data = await spotify.makeGetPlaylistRequest(plId, ["tracks.total"]);
+    const data = (await spotify.makeGetPlaylistRequest(plId, [
+        "tracks.total",
+    ])) as PlaylistTracksResponse;
     if (!data) {
         return false;
     }
@@ -25,9 +36,9 @@ async function performHardShuffle(plId: string, token: string): Promise<boolean>
     if (plsLeng < 2) {
         return true;
     }
-    const window = Math.ceil(plsLeng/MAX_REQS);
+    const window = Math.ceil(plsLeng / MAX_REQS);
     let paste = 0;
-    for (let i=0; i<MAX_REQS; ++i) {
+    for (let i = 0; i < MAX_REQS; ++i) {
         const lastPossibleStartIndex = plsLeng - window;
         if (paste > lastPossibleStartIndex) {
             // there's fewer tracks left to shuffle than a full window
@@ -36,11 +47,16 @@ async function performHardShuffle(plId: string, token: string): Promise<boolean>
 
         // pick an int randomly from [paste, lastPossibleStartIndex]
         const startIndex =
-            Math.floor(Math.random() * (lastPossibleStartIndex - paste + 1)) + paste
+            Math.floor(Math.random() * (lastPossibleStartIndex - paste + 1)) +
+            paste;
 
         const resp = await spotify.makeUpdatePlaylistItemsRequest(
-            plId, startIndex, paste, window);
-        if(!resp) {
+            plId,
+            startIndex,
+            paste,
+            window,
+        );
+        if (!resp) {
             return false;
         }
 
@@ -52,14 +68,14 @@ async function performHardShuffle(plId: string, token: string): Promise<boolean>
 
 function makeErrorResponse(message: string, code: number) {
     const bodyData = {
-        errorMessage: message
+        errorMessage: message,
     };
     return new Response(JSON.stringify(bodyData), {
-        status: code
+        status: code,
     });
 }
 
-export const PUT: APIRoute = async ({params, request, url, cookies, redirect}) => {
+export const PUT: APIRoute = async ({ params, request, cookies, redirect }) => {
     const token = cookies.get("session")?.value;
     if (token === undefined) {
         return redirect("/auth");
@@ -71,13 +87,13 @@ export const PUT: APIRoute = async ({params, request, url, cookies, redirect}) =
         if (!reqData.action || reqData.action != "shuffle") {
             throw new Error();
         }
-    } catch(error) {
+    } catch (error) {
         return makeErrorResponse("Bad request body", 400);
     }
 
-    if(await performHardShuffle(params.pl_id!, token)) {
+    if (await performHardShuffle(params.pl_id!, token)) {
         return new Response(null, {
-            status: 200
+            status: 200,
         });
     } else {
         return makeErrorResponse("Error shuffling playlist", 500);
