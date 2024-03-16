@@ -124,16 +124,27 @@ export class SpotifyAPIHelper {
         return this.handleRequest(req);
     }
 
-    // CHRISTIAN START HERE: make this work with unknown and keep correcting lint errors
+    // CHRISTIAN TODO: consider a proper validation library for further changes to these functions
     validatePlaylistData(obj: unknown): obj is PlaylistData {
-        const nameC = typeof obj.name === "string";
+        if (typeof obj !== "object" || obj == null){
+            return false;
+        }
+
+        if (!("name" in obj) || typeof obj.name !== "string" || !("tracks" in obj) || typeof obj.tracks !== "object"  || obj.tracks == null || !("images" in obj) || typeof obj.images !== "object" || obj.images == null) {
+            return false;
+        }
+
+        if (!("href" in obj.tracks) || !("total" in obj.tracks)) {
+            return false;
+        }
+
         const tracksC =
             obj.tracks &&
             typeof obj.tracks.href === "string" &&
             typeof obj.tracks.total === "number";
         const imagesC = Array.isArray(obj.images);
 
-        return nameC && tracksC && imagesC;
+        return tracksC && imagesC;
     }
 
     validateMePlaylistsResponse(data: unknown): data is MePlaylistsResponse {
