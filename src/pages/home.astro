@@ -8,7 +8,7 @@ import { SpotifyAPIHelper } from "../script/spotify_api";
 /* CHRISTIAN PLAN
 Tasks
 XX Create a playlists endpoint that takes offset and limit and make sure it returns the html we expect
--- Set up htmx
+XX Set up htmx
 -- Home page asks for playlists and displays them
 -- Modify endpoint to take an arg that embeds an htmx request on reveal, load, or none, and make sure infinite scroll works
 -- Show spinners
@@ -46,7 +46,7 @@ const spotify = new SpotifyAPIHelper(token);
 let resps;
 try {
     resps = await Promise.all([
-        spotify.makeCurrentUserPlaylistRequest(),
+        spotify.makeCurrentUserPlaylistRequest(undefined, 1),
         spotify.makeCurrentUserRequest(),
     ]);
 } catch (error) {
@@ -138,6 +138,7 @@ const numPlaylists = plData.total;
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <meta name="viewport" content="width=device-width" />
         <meta name="generator" content={Astro.generator} />
+        <script src="https://unpkg.com/htmx.org@1.9.11" integrity="sha384-0gxUXCCR8yv9FM2b+U3FDbsKthCI66oH5IA9fHppQq9DDMHuMauqq1ZHBpJxQ0J0" crossorigin="anonymous"></script>
         <title>Astro</title>
     </head>
     <body>
