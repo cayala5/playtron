@@ -1,14 +1,33 @@
 ---
-/* CHRISTIAN START HERE: make request with spotify.makeCurrentUserPlaylistRequest()
- * with the offset and limit we read from the request, and return the proper html partial
- */
-//import PlaylistTile from "../../components/playlist-tile.astro";
+import PlaylistTile from "../../components/playlist-tile.astro";
+import { SpotifyAPIHelper } from "../../script/spotify_api";
 
 export const partial = true;
 
-console.log("CHRISTIAN");
-console.log(Astro.url);
 const token = Astro.cookies.get("session")?.value;
-console.log(token);
+if (token === undefined) {
+    return Astro.redirect("/auth");
+}
+
+const params = Astro.url.searchParams;
+const limit = params.has("limit") ? parseInt(params.get("limit")!) : undefined;
+const offset = params.has("offset") ? parseInt(params.get("offset")!) : undefined;
+
+const spotify = new SpotifyAPIHelper(token);
+const plData = await spotify.makeCurrentUserPlaylistRequest(offset, limit);
+if (!spotify.validateMePlaylistsResponse(plData)) {
+    console.log("Request to /me/playlists failed to return the right data");
+    return Astro.redirect("/error");
+}
 ---
-<div class="hi"/>
+
+{
+    plData.items.map((pl) => (
+        <PlaylistTile
+            name={pl.name}
+            tracks={pl.tracks.total}
+            imageSrc={pl.images[0].url}
+            plId={pl.id}
+        />
+    ))
+}

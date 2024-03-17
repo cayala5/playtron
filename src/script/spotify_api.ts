@@ -93,8 +93,25 @@ export class SpotifyAPIHelper {
         return this.makeGetRequest("/me");
     }
 
-    async makeCurrentUserPlaylistRequest() {
-        return this.makeGetRequest("/me/playlists");
+    async makeCurrentUserPlaylistRequest(offset?: number, limit?: number) {
+        let endpoint = "/me/playlists";
+        const options = new URLSearchParams();
+        let append = false;
+
+        if (offset) {
+            options.append("offset",  offset.toString());
+            append = true;
+        }
+        if (limit) {
+            options.append("limit", limit.toString());
+            append = true;
+        }
+
+        if (append) {
+            endpoint += "?" + options.toString();
+        }
+        const req = this.makeGetRequestRaw(endpoint);
+        return this.handleRequest(req);
     }
 
     async makeGetPlaylistRequest(playlistId: string, fields?: string[]) {
