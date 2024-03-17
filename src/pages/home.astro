@@ -9,12 +9,13 @@ import { SpotifyAPIHelper } from "../script/spotify_api";
 Tasks
 XX Create a playlists endpoint that takes offset and limit and make sure it returns the html we expect
 XX Set up htmx
--- Home page asks for playlists and displays them
+XX Home page asks for playlists and displays them
 -- Modify endpoint to take an arg that embeds an htmx request on reveal, load, or none, and make sure infinite scroll works
 -- Show spinners
 -- Set up alpine
 -- Implement filtering search bar
 -- Make request on first search for playlists with load embed
+-- either begin on "click icon replaces header" or reinstall playlist tile handler for now
 
 Features
 -- infinite scroll UI of all playlists
@@ -165,6 +166,6 @@ const numPlaylists = plData.total;
                 </div>
             </div>
         </div>
-        <PlaylistArea data={plData} />
+        <PlaylistArea />
     </body>
 </html>

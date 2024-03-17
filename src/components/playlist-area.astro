@@ -1,12 +1,4 @@
 ---
-import PlaylistTile from "./playlist-tile.astro";
-import type { MePlaylistsResponse } from "../script/spotify_api";
-
-interface Props {
-    data: MePlaylistsResponse;
-}
-
-const { data } = Astro.props;
 ---
 
 <style>
@@ -18,7 +10,20 @@ const { data } = Astro.props;
         justify-items: center;
         justify-content: center;
     }
+
+    .root :global(.playlist-tile) {
+        display: grid;
+        grid-template-columns: 1fr;
+        width: 100px;
+        .text-area {
+            text-align: left;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    }
 </style>
+
 <div class="pad root" hx-get="/playlists" hx-trigger="load">
 
 </div>
