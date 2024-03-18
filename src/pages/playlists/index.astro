@@ -1,0 +1,63 @@
+---
+import PlaylistTile from "../../components/playlist-tile.astro";
+import { SpotifyAPIHelper } from "../../script/spotify_api";
+
+/*
+ * This page implements the /playlists endpoint
+ *
+ * Params:
+ *    - offset?: number = Offset of first playlist to return, default 0
+ *    - limit?: number = How many playlists to return, default 20
+ *    - trigger?: string = If specified, the last item returned
+ *    will have an hx-get to request the next set of playlists, using the
+ *    given offset, limit, and trigger. The hx-trigger will be the value of
+ *    this parameter. If there are no more playlists, no trigger will be set
+ *    in any case.
+ */
+
+export const partial = true;
+
+const token = Astro.cookies.get("session")?.value;
+if (token === undefined) {
+    return Astro.redirect("/auth");
+}
+
+const params = Astro.url.searchParams;
+const limit = params.has("limit") ? parseInt(params.get("limit")!) : 20;
+const offset = params.has("offset") ? parseInt(params.get("offset")!) : 0;
+const trigger = params.get("trigger");
+
+const spotify = new SpotifyAPIHelper(token);
+const plData = await spotify.makeCurrentUserPlaylistRequest(offset, limit);
+if (!spotify.validateMePlaylistsResponse(plData)) {
+    console.log("Request to /me/playlists failed to return the right data");
+    return Astro.redirect("/error");
+}
+
+const numItems = plData.items.length;
+const more = trigger != null && plData.next !== null;
+let nextReq = "";
+if (trigger !== null) {
+    const queryParams = new URLSearchParams();
+    queryParams.append("offset", (offset+limit).toString());
+    queryParams.append("limit", limit.toString());
+    queryParams.append("trigger", trigger);
+    nextReq = "/playlists?" + queryParams.toString();
+}
+
+---
+
+{
+    plData.items.map((pl, i) => (
+        <PlaylistTile
+            name={pl.name}
+            tracks={pl.tracks.total}
+            imageSrc={pl.images.length > 0 ? pl.images[0].url : ""}
+            plId={pl.id}
+            paging={i == numItems - 1 && more ? {
+                trigger,
+                nextReq
+            } : undefined}
+        />
+    ))
+}

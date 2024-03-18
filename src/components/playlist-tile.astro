@@ -1,31 +1,22 @@
 ---
 import { Image } from "astro:assets";
+import defaultPlaylistImage from "../images/default_playlist.png";
 interface Props {
     name: string;
     tracks: number;
     imageSrc: string;
     plId: string;
+    paging?: {
+        trigger: string;
+        nextReq: string;
+    }
 }
 
-const { name, tracks, imageSrc, plId } = Astro.props;
+const { name, tracks, plId, paging, imageSrc } = Astro.props;
 ---
 
-<style>
-    .root {
-        display: grid;
-        grid-template-columns: 1fr;
-        width: 100px;
-    }
-
-    .text-area {
-        text-align: left;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-</style>
-
 <script>
+    // CHRISTIAN: this isn't getting sent now because we're using htmx partials
     const tiles = document.querySelectorAll("div.playlist-tile");
 
     async function makePutRequest(plId: string) {
@@ -54,9 +45,17 @@ const { name, tracks, imageSrc, plId } = Astro.props;
     });
 </script>
 
-<div class="root card playlist-tile" data-pl-id={plId} data-name={name}>
+<div
+    class="root card playlist-tile"
+    data-pl-id={plId}
+    data-name={name}
+    hx-get={paging?.nextReq}
+    hx-swap={paging ? "afterend": undefined}
+    hx-trigger={paging?.trigger}
+>
+{/* CHRISTIAN: why does ts hate this? */}
     <Image
-        src={imageSrc}
+        src={imageSrc || defaultPlaylistImage}
         alt=`Cover of playlist "${name}"`
         height={100}
         width={100}
