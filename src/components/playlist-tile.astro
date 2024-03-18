@@ -1,13 +1,18 @@
 ---
 import { Image } from "astro:assets";
+import defaultPlaylistImage from "../images/default_playlist.png";
 interface Props {
     name: string;
     tracks: number;
     imageSrc: string;
     plId: string;
+    paging?: {
+        trigger: string;
+        nextReq: string;
+    }
 }
 
-const { name, tracks, imageSrc, plId } = Astro.props;
+const { name, tracks, plId, paging, imageSrc } = Astro.props;
 ---
 
 <script>
@@ -44,12 +49,13 @@ const { name, tracks, imageSrc, plId } = Astro.props;
     class="root card playlist-tile"
     data-pl-id={plId}
     data-name={name}
-    hx-get="/playlists?limit=20"
-    hx-swap="afterend"
-    hx-trigger="revealed"
+    hx-get={paging?.nextReq}
+    hx-swap={paging ? "afterend": undefined}
+    hx-trigger={paging?.trigger}
 >
+{/* CHRISTIAN: why does ts hate this? */}
     <Image
-        src={imageSrc}
+        src={imageSrc || defaultPlaylistImage}
         alt=`Cover of playlist "${name}"`
         height={100}
         width={100}

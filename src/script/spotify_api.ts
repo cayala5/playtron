@@ -20,6 +20,7 @@ export interface PlaylistData {
 export interface MePlaylistsResponse {
     total: number;
     items: PlaylistData[];
+    next: string | null;
 }
 
 function getJsonResponseData(response: Response) {
