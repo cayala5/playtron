@@ -40,7 +40,14 @@ const { name, tracks, imageSrc, plId } = Astro.props;
     });
 </script>
 
-<div class="root card playlist-tile" data-pl-id={plId} data-name={name}>
+<div
+    class="root card playlist-tile"
+    data-pl-id={plId}
+    data-name={name}
+    hx-get="/playlists?limit=20"
+    hx-swap="afterend"
+    hx-trigger="revealed"
+>
     <Image
         src={imageSrc}
         alt=`Cover of playlist "${name}"`

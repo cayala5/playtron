@@ -19,15 +19,20 @@ if (!spotify.validateMePlaylistsResponse(plData)) {
     console.log("Request to /me/playlists failed to return the right data");
     return Astro.redirect("/error");
 }
+
+const numItems = plData.items.length;
+const allButLast = plData.items.slice(0, numItems - 1);
+const last = plData.items[numItems-1];
 ---
 
 {
-    plData.items.map((pl) => (
+    plData.items.map((pl, i) => (
         <PlaylistTile
             name={pl.name}
             tracks={pl.tracks.total}
             imageSrc={pl.images[0].url}
             plId={pl.id}
+            hx-get={i == numItems - 1 ? "load" : null}
         />
     ))
 }
